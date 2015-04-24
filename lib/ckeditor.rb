@@ -7,27 +7,6 @@ module Ckeditor
   autoload :TextArea, 'ckeditor/text_area'
   autoload :Paginatable, 'ckeditor/paginatable'
 
-  module Helpers
-    autoload :ViewHelper, 'ckeditor/helpers/view_helper'
-    autoload :FormHelper, 'ckeditor/helpers/form_helper'
-    autoload :FormBuilder, 'ckeditor/helpers/form_builder'
-    autoload :Controllers, 'ckeditor/helpers/controllers'
-  end
-
-  module Hooks
-    autoload :SimpleFormBuilder, 'ckeditor/hooks/simple_form'
-    autoload :CanCanAuthorization, 'ckeditor/hooks/cancan'
-    autoload :PunditAuthorization, 'ckeditor/hooks/pundit'
-  end
-
-  module Backend
-    autoload :Paperclip, 'ckeditor/backend/paperclip'
-    autoload :CarrierWave, 'ckeditor/backend/carrierwave'
-    autoload :Dragonfly, 'ckeditor/backend/dragonfly'
-  end
-
-  IMAGE_TYPES = %w(image/jpeg image/png image/gif image/jpg image/pjpeg image/tiff image/x-png)
-
   DEFAULT_AUTHORIZE = Proc.new {}
 
   AUTHORIZATION_ADAPTERS = {}
@@ -35,16 +14,6 @@ module Ckeditor
   DEFAULT_CURRENT_USER = Proc.new do
     request.env["warden"].try(:user) || respond_to?(:current_user) && current_user
   end
-
-  # Allowed image file types for upload.
-  # Set to nil or [] (empty array) for all file types
-  mattr_accessor :image_file_types
-  @@image_file_types = %w(jpg jpeg png gif tiff)
-
-  # Allowed attachment file types for upload.
-  # Set to nil or [] (empty array) for all file types
-  mattr_accessor :attachment_file_types
-  @@attachment_file_types = %w(doc docx xls odt ods pdf rar zip tar tar.gz swf)
 
   # Ckeditor files destination path
   mattr_accessor :relative_path
@@ -100,52 +69,6 @@ module Ckeditor
   # All css and js files from ckeditor folder
   def self.assets
     @@assets ||= Utils.select_assets("ckeditor", "vendor/assets/javascripts") << "ckeditor/init.js"
-  end
-
-  def self.picture_model(&block)
-    if block_given?
-      self.picture_model = block
-    else
-      @@picture_model_class ||= begin
-        if @@picture_model.respond_to? :call
-          @@picture_model.call
-        else
-          @@picture_model || Ckeditor::Picture
-        end
-      end
-    end
-  end
-
-  def self.picture_model=(value)
-    @@picture_model_class = nil
-    @@picture_model = value
-  end
-
-  def self.picture_adapter
-    picture_model.to_adapter
-  end
-
-  def self.attachment_file_model(&block)
-    if block_given?
-      self.attachment_file_model = block
-    else
-      @@attachment_file_model_class ||= begin
-        if @@attachment_file_model.respond_to? :call
-          @@attachment_file_model.call
-        else
-          @@attachment_file_model || Ckeditor::AttachmentFile
-        end
-      end
-    end
-  end
-
-  def self.attachment_file_model=(value)
-    @@attachment_file_model_class = nil
-    @@attachment_file_model = value
-  end
-
-  def self.attachment_file_adapter
-    attachment_file_model.to_adapter
   end
 
   # Setup authorization to be run as a before filter

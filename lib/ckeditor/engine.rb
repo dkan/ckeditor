@@ -10,6 +10,7 @@ module Ckeditor
     end
 
     initializer "ckeditor.helpers" do
+      Logger.new(STDOUT).info '**************'
       ActiveSupport.on_load(:action_controller) do
         ActionController::Base.send :include, Ckeditor::Helpers::Controllers
       end
